@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String         @id @default(cuid())
+  username     String         @unique
+  password     String
+  role         Role           @default(EMPLOYEE)
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  leaveRequests LeaveRequest[]
+  notifications Notification[]
+}
+
+model LeaveRequest {
+  id              String        @id @default(cuid())
+
+  reason          String
+  startDate       DateTime
+  endDate         DateTime
+
+  documentPath    String?
+
+  status          LeaveStatus   @default(PENDING)
+
+  managerRemarks  String?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  employeeId      String
+  employee        User          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String      @id @default(cuid())
+
+  message     String
+
+  isRead      Boolean     @default(false)
+
+  createdAt   DateTime    @default(now())
+
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
