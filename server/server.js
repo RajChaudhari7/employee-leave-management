@@ -5,6 +5,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import authRoutes from "./src/routes/auth.routes.js";
+import employeeRoutes from "./src/routes/employee.routes.js";
 dotenv.config();
 
 const app = express();
@@ -21,7 +22,8 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-app.use("/api/auth" , authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/employee", employeeRoutes);
 
 app.get("/", (req, res) => {
   res.json({
