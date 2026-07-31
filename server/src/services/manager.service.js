@@ -109,3 +109,31 @@ export const getAllLeaveRequests = async () => {
   });
   return leaves;
 };
+
+export const updateLeaveStatus = async (leaveId, status, managerRemarks) => {
+  const leave = await prisma.leaveRequest.findUnique({
+    where: {
+      id: leaveId,
+    },
+  });
+
+  if (!leave) {
+    throw new Error("Leave request not found");
+  }
+
+  if (leave.status !== "PENDING") {
+    throw new Error("Leave requeest has already been processed");
+  }
+
+  const updateLeave = await prisma.leaveRequest.update({
+    where: {
+      id: leaveId,
+    },
+    data: {
+      status,
+      managerRemarks,
+    },
+  });
+
+  return updateLeave;
+};
