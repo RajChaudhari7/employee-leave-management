@@ -6,6 +6,7 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import authRoutes from "./src/routes/auth.routes.js";
 import employeeRoutes from "./src/routes/employee.routes.js";
+import managerRoutes from "./src/routes/manager.routes.js";
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,7 @@ app.listen(PORT, () => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/employee", employeeRoutes);
+app.use("/api/manager", managerRoutes);
 
 app.get("/", (req, res) => {
   res.json({

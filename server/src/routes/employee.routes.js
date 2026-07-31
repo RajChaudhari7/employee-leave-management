@@ -1,6 +1,7 @@
 import express from "express";
 import {
   applyLeaveController,
+  employeeDashboard,
   getLeaveHistoryController,
 } from "../controllers/employee.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
@@ -16,5 +17,6 @@ employeeRoutes.post(
 );
 
 employeeRoutes.get("/leave-history", authMiddleware, getLeaveHistoryController);
+employeeRoutes.get("/dashboard", authMiddleware, employeeDashboard);
 
 export default employeeRoutes;

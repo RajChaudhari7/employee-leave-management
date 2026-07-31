@@ -41,3 +41,42 @@ export const getLeaveHistory = async (userId) => {
 
   return leaves;
 };
+
+export const getDashboardData = async (userId) => {
+  const [totalLeaves, pendingLeaves, approvedLeaves, rejectedLeaves] =
+    await Promise.all([
+      prisma.leaveRequest.count({
+        where: {
+          employeeId: userId,
+        },
+      }),
+
+      prisma.leaveRequest.count({
+        where: {
+          employeeId: userId,
+          status: "PENDING",
+        },
+      }),
+
+      prisma.leaveRequest.count({
+        where: {
+          employeeId: userId,
+          status: "APPROVED",
+        },
+      }),
+
+      prisma.leaveRequest.count({
+        where: {
+          employeeId: userId,
+          status: "REJECTED",
+        },
+      }),
+    ]);
+
+  return {
+    totalLeaves,
+    pendingLeaves,
+    approvedLeaves,
+    rejectedLeaves,
+  };
+};
