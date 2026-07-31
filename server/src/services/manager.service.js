@@ -122,18 +122,29 @@ export const updateLeaveStatus = async (leaveId, status, managerRemarks) => {
   }
 
   if (leave.status !== "PENDING") {
-    throw new Error("Leave requeest has already been processed");
+    throw new Error("Leave request has already been processed");
   }
 
-  const updateLeave = await prisma.leaveRequest.update({
-    where: {
-      id: leaveId,
-    },
-    data: {
-      status,
-      managerRemarks,
-    },
+  const updatedLeave = await prisma.$transaction(async (tx) => {
+    const leaveData = await tx.leaveRequest.update({
+      where: {
+        id: leaveId,
+      },
+      data: {
+        status,
+        managerRemarks,
+      },
+    });
+
+    await tx.notification.create({
+      data: {
+        userId: leave.employeeId,
+        message: `Your leave request from ${leave.startDate.toLocaleDateString()} to ${leave.endDate.toLocaleDateString()} has been ${status}.`,
+      },
+    });
+
+    return leaveData;
   });
 
-  return updateLeave;
+  return updatedLeave;
 };
