@@ -1,9 +1,12 @@
 import express from "express";
-import { applyLeaveController } from "../controllers/employee.controller.js";
+import {
+  applyLeaveController,
+  getLeaveHistoryController,
+} from "../controllers/employee.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import upload from "../middleware/upload.middleware.js";
 
-const employeeRoutes = express.Route();
+const employeeRoutes = express.Router();
 
 employeeRoutes.post(
   "/leave",
@@ -11,5 +14,7 @@ employeeRoutes.post(
   upload.single("document"),
   applyLeaveController,
 );
+
+employeeRoutes.get("/leave-history", authMiddleware, getLeaveHistoryController);
 
 export default employeeRoutes;

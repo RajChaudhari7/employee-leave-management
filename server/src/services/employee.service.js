@@ -18,3 +18,26 @@ export const applyLeave = async ({
   });
   return leave;
 };
+
+export const getLeaveHistory = async (userId) => {
+  const leaves = await prisma.leaveRequest.findMany({
+    where: {
+      employeeId: userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      id: true,
+      reason: true,
+      startDate: true,
+      endDate: true,
+      status: true,
+      managerRemarks: true,
+      documentPath: true,
+      createdAt: true,
+    },
+  });
+
+  return leaves;
+};
