@@ -24,10 +24,14 @@ export const managerDashboard = async (req, res) => {
 
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await getAllEmployees();
+    const { page = 1, limit = 10, search = "" } = req.query;
+
+    const result = await getAllEmployees(page, limit, search);
+
     return res.status(200).json({
       success: true,
-      data: employees,
+      data: result.employees,
+      pagination: result.pagination,
     });
   } catch (error) {
     return res.status(500).json({
@@ -39,11 +43,14 @@ export const getEmployees = async (req, res) => {
 
 export const getAllLeaves = async (req, res) => {
   try {
-    const leaves = await getAllLeaveRequests();
+    const { page = 1, limit = 10, status = "", search = "" } = req.query;
+
+    const result = await getAllLeaveRequests(page, limit, status, search);
 
     return res.status(200).json({
       success: true,
-      data: leaves,
+      data: result.leaves,
+      pagination: result.pagination,
     });
   } catch (error) {
     return res.status(500).json({
@@ -73,7 +80,7 @@ export const updateLeaveStatusController = async (req, res) => {
   } catch (error) {
     return res.status(400).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };

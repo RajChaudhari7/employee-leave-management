@@ -1,5 +1,16 @@
 import prisma from "../config/prisma.js";
 
+
+const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+
+return leaves.map((leave) => ({
+  ...leave,
+  documentUrl: leave.documentPath
+    ? `${BASE_URL}/${leave.documentPath.replace("src/", "")}`
+    : null,
+}));
+
+
 export const getManagerDashboard = async () => {
   const [totalEmployees, pendingLeaves, approvedLeaves, rejectedLeaves] =
     await Promise.all([
@@ -36,78 +47,135 @@ export const getManagerDashboard = async () => {
   };
 };
 
-export const getAllEmployees = async () => {
-  const employees = await prisma.user.findMany({
-    where: {
-      role: "EMPLOYEE",
+export const getAllEmployees = async (
+  page = 1,
+  limit = 10,
+  search = ""
+) => {
+  page = Number(page);
+  limit = Number(limit);
+
+  const skip = (page - 1) * limit;
+
+  const where = {
+    role: "EMPLOYEE",
+    username: {
+      contains: search,
+      mode: "insensitive",
     },
+  };
 
-    orderBy: {
-      createdAt: "desc",
-    },
-
-    select: {
-      id: true,
-      username: true,
-      createdAt: true,
-
-      leaveRequests: {
-        select: {
-          status: true,
+  const [employees, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        leaveRequests: {
+          select: {
+            status: true,
+          },
         },
       },
+    }),
+
+    prisma.user.count({
+      where,
+    }),
+  ]);
+
+  const data = employees.map((employee) => ({
+    id: employee.id,
+    username: employee.username,
+    createdAt: employee.createdAt,
+
+    totalLeaves: employee.leaveRequests.length,
+
+    pendingLeaves: employee.leaveRequests.filter(
+      (leave) => leave.status === "PENDING"
+    ).length,
+
+    approvedLeaves: employee.leaveRequests.filter(
+      (leave) => leave.status === "APPROVED"
+    ).length,
+
+    rejectedLeaves: employee.leaveRequests.filter(
+      (leave) => leave.status === "REJECTED"
+    ).length,
+  }));
+
+  return {
+    employees: data,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
     },
-  });
-
-  return employees.map((employee) => {
-    const leaveCount = employee.leaveRequests.length;
-
-    const pendingLeaves = employee.leaveRequests.filter(
-      (leave) => leave.status === "PENDING",
-    ).length;
-
-    const approvedLeaves = employee.leaveRequests.filter(
-      (leave) => leave.status === "APPROVED",
-    ).length;
-
-    const rejectedLeaves = employee.leaveRequests.filter(
-      (leave) => leave.status === "REJECTED",
-    ).length;
-
-    return {
-      id: employee.id,
-
-      username: employee.username,
-
-      createdAt: employee.createdAt,
-
-      leaveCount,
-
-      pendingLeaves,
-
-      approvedLeaves,
-
-      rejectedLeaves,
-    };
-  });
+  };
 };
 
-export const getAllLeaveRequests = async () => {
-  const leaves = await prisma.leaveRequest.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
+export const getAllLeaveRequests = async (
+  page = 1,
+  limit = 10,
+  status = "",
+  search = ""
+) => {
+  page = Number(page);
+  limit = Number(limit);
 
-    include: {
-      employee: {
-        select: {
-          id: true,
-          username: true,
+  const skip = (page - 1) * limit;
+
+  const where = {};
+
+  if (status) {
+    where.status = status;
+  }
+
+  if (search) {
+    where.employee = {
+      username: {
+        contains: search,
+        mode: "insensitive",
+      },
+    };
+  }
+
+  const [leaves, total] = await Promise.all([
+    prisma.leaveRequest.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        employee: {
+          select: {
+            id: true,
+            username: true,
+          },
         },
       },
+    }),
+
+    prisma.leaveRequest.count({
+      where,
+    }),
+  ]);
+
+  return {
+    leaves,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
     },
-  });
-  return leaves;
+  };
 };
 
 export const updateLeaveStatus = async (leaveId, status, managerRemarks) => {

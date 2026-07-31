@@ -8,6 +8,8 @@ import authRoutes from "./src/routes/auth.routes.js";
 import employeeRoutes from "./src/routes/employee.routes.js";
 import managerRoutes from "./src/routes/manager.routes.js";
 import notificationRoutes from "./src/routes/notification.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
 dotenv.config();
 
 const app = express();
@@ -18,6 +20,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
