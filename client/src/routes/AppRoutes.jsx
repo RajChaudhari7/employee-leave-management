@@ -5,11 +5,13 @@ import EmployeeDashboard from "../pages/employee/Dashboard";
 import ManagerLayout from "../layouts/ManagerLayout";
 import ManagerDashboard from "../pages/manager/Dashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
+import ApplyLeave from "../pages/employee/ApplyLeave";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      
 
       <Route
         path="/employee"
@@ -20,6 +22,7 @@ export default function AppRoutes() {
         }
       >
         <Route path="dashboard" element={<EmployeeDashboard />} />
+        <Route path="apply-leave" element={<ApplyLeave />} />
       </Route>
 
       <Route
