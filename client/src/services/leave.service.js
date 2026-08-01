@@ -9,3 +9,11 @@ export const applyLeave = async (formData) => {
 
   return response.data;
 };
+
+export const getLeaveHistory = async (params = {}) => {
+  const response = await api.get("/employee/leave-history", {
+    params,
+  });
+
+  return response.data;
+};
