@@ -26,9 +26,9 @@ export default function Login() {
       toast.success("Login Successful");
 
       if (response.data.user.role === "MANAGER") {
-        navigate("/manager");
+        navigate("/manager/dashboard");
       } else {
-        navigate("/employee");
+        navigate("/employee/dashboard");
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Login Failed");
