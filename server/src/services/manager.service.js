@@ -1,16 +1,5 @@
 import prisma from "../config/prisma.js";
 
-
-const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
-
-return leaves.map((leave) => ({
-  ...leave,
-  documentUrl: leave.documentPath
-    ? `${BASE_URL}/${leave.documentPath.replace("src/", "")}`
-    : null,
-}));
-
-
 export const getManagerDashboard = async () => {
   const [totalEmployees, pendingLeaves, approvedLeaves, rejectedLeaves] =
     await Promise.all([
@@ -47,11 +36,7 @@ export const getManagerDashboard = async () => {
   };
 };
 
-export const getAllEmployees = async (
-  page = 1,
-  limit = 10,
-  search = ""
-) => {
+export const getAllEmployees = async (page = 1, limit = 10, search = "") => {
   page = Number(page);
   limit = Number(limit);
 
@@ -95,15 +80,15 @@ export const getAllEmployees = async (
     totalLeaves: employee.leaveRequests.length,
 
     pendingLeaves: employee.leaveRequests.filter(
-      (leave) => leave.status === "PENDING"
+      (leave) => leave.status === "PENDING",
     ).length,
 
     approvedLeaves: employee.leaveRequests.filter(
-      (leave) => leave.status === "APPROVED"
+      (leave) => leave.status === "APPROVED",
     ).length,
 
     rejectedLeaves: employee.leaveRequests.filter(
-      (leave) => leave.status === "REJECTED"
+      (leave) => leave.status === "REJECTED",
     ).length,
   }));
 
@@ -122,7 +107,7 @@ export const getAllLeaveRequests = async (
   page = 1,
   limit = 10,
   status = "",
-  search = ""
+  search = "",
 ) => {
   page = Number(page);
   limit = Number(limit);
@@ -167,8 +152,17 @@ export const getAllLeaveRequests = async (
     }),
   ]);
 
+  const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+
+  const formattedLeaves = leaves.map((leave) => ({
+    ...leave,
+    documentUrl: leave.documentPath
+      ? `${BASE_URL}/${leave.documentPath.replace("src/", "")}`
+      : null,
+  }));
+
   return {
-    leaves,
+    leaves: formattedLeaves,
     pagination: {
       page,
       limit,
