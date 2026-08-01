@@ -7,12 +7,12 @@ import ManagerDashboard from "../pages/manager/Dashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 import ApplyLeave from "../pages/employee/ApplyLeave";
 import LeaveHistory from "../pages/employee/LeaveHistory";
+import Notifications from "../pages/employee/Notifications";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      
 
       <Route
         path="/employee"
@@ -25,6 +25,7 @@ export default function AppRoutes() {
         <Route path="dashboard" element={<EmployeeDashboard />} />
         <Route path="apply-leave" element={<ApplyLeave />} />
         <Route path="history" element={<LeaveHistory />} />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
 
       <Route
