@@ -1,41 +1,52 @@
 import prisma from "../config/prisma.js";
 
 export const getManagerDashboard = async () => {
-  const [totalEmployees, pendingLeaves, approvedLeaves, rejectedLeaves] =
-    await Promise.all([
-      prisma.user.count({
-        where: {
-          role: "EMPLOYEE",
-        },
-      }),
+  const [
+    totalEmployees,
+    pendingLeaves,
+    approvedLeaves,
+    rejectedLeaves,
+    recentLeaves,
+  ] = await Promise.all([
+    prisma.user.count({
+      where: { role: "EMPLOYEE" },
+    }),
 
-      prisma.leaveRequest.count({
-        where: {
-          status: "PENDING",
-        },
-      }),
+    prisma.leaveRequest.count({
+      where: { status: "PENDING" },
+    }),
 
-      prisma.leaveRequest.count({
-        where: {
-          status: "APPROVED",
-        },
-      }),
+    prisma.leaveRequest.count({
+      where: { status: "APPROVED" },
+    }),
 
-      prisma.leaveRequest.count({
-        where: {
-          status: "REJECTED",
+    prisma.leaveRequest.count({
+      where: { status: "REJECTED" },
+    }),
+
+    prisma.leaveRequest.findMany({
+      take: 5,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        employee: {
+          select: {
+            username: true,
+          },
         },
-      }),
-    ]);
+      },
+    }),
+  ]);
 
   return {
     totalEmployees,
     pendingLeaves,
     approvedLeaves,
     rejectedLeaves,
+    recentLeaves,
   };
 };
-
 export const getAllEmployees = async (page = 1, limit = 10, search = "") => {
   page = Number(page);
   limit = Number(limit);
@@ -154,12 +165,22 @@ export const getAllLeaveRequests = async (
 
   const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
-  const formattedLeaves = leaves.map((leave) => ({
-    ...leave,
-    documentUrl: leave.documentPath
-      ? `${BASE_URL}/${leave.documentPath.replace("src/", "")}`
-      : null,
-  }));
+  const formattedLeaves = leaves.map((leave) => {
+    let documentUrl = null;
+
+    if (leave.documentPath) {
+      const normalizedPath = leave.documentPath
+        .replace(/^src[\\/]/, "")
+        .replace(/\\/g, "/");
+
+      documentUrl = `${BASE_URL}/${normalizedPath}`;
+    }
+
+    return {
+      ...leave,
+      documentUrl,
+    };
+  });
 
   return {
     leaves: formattedLeaves,

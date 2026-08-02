@@ -10,7 +10,7 @@ export default function ManagerLayout() {
       <div className="flex-1">
         <Navbar />
 
-        <main className="p-6">
+        <main className="ml-72 flex-1 overflow-y-auto p-6">
           <Outlet />
         </main>
       </div>

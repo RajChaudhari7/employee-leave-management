@@ -8,6 +8,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import ApplyLeave from "../pages/employee/ApplyLeave";
 import LeaveHistory from "../pages/employee/LeaveHistory";
 import Notifications from "../pages/employee/Notifications";
+import LeaveRequests from "../pages/manager/LeaveRequests";
 
 export default function AppRoutes() {
   return (
@@ -37,6 +38,7 @@ export default function AppRoutes() {
         }
       >
         <Route path="dashboard" element={<ManagerDashboard />} />
+        <Route path="leaves" element={<LeaveRequests   />} />
       </Route>
     </Routes>
   );
