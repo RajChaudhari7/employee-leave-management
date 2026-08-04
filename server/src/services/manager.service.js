@@ -6,29 +6,44 @@ export const getManagerDashboard = async () => {
     pendingLeaves,
     approvedLeaves,
     rejectedLeaves,
+
     recentLeaves,
+
+    monthlyLeaves,
+
+    employees,
   ] = await Promise.all([
     prisma.user.count({
-      where: { role: "EMPLOYEE" },
+      where: {
+        role: "EMPLOYEE",
+      },
     }),
 
     prisma.leaveRequest.count({
-      where: { status: "PENDING" },
+      where: {
+        status: "PENDING",
+      },
     }),
 
     prisma.leaveRequest.count({
-      where: { status: "APPROVED" },
+      where: {
+        status: "APPROVED",
+      },
     }),
 
     prisma.leaveRequest.count({
-      where: { status: "REJECTED" },
+      where: {
+        status: "REJECTED",
+      },
     }),
 
     prisma.leaveRequest.findMany({
       take: 5,
+
       orderBy: {
         createdAt: "desc",
       },
+
       include: {
         employee: {
           select: {
@@ -37,16 +52,50 @@ export const getManagerDashboard = async () => {
         },
       },
     }),
+
+    prisma.leaveRequest.groupBy({
+      by: ["startDate"],
+
+      _count: true,
+    }),
+
+    prisma.user.findMany({
+      where: {
+        role: "EMPLOYEE",
+      },
+
+      include: {
+        leaveRequests: {
+          where: {
+            status: "APPROVED",
+          },
+        },
+      },
+    }),
   ]);
+
+  const topEmployees = employees
+    .map((employee) => ({
+      username: employee.username,
+      approvedLeaves: employee.leaveRequests.length,
+    }))
+    .sort((a, b) => b.approvedLeaves - a.approvedLeaves)
+    .slice(0, 5);
 
   return {
     totalEmployees,
     pendingLeaves,
     approvedLeaves,
     rejectedLeaves,
+
     recentLeaves,
+
+    monthlyLeaves,
+
+    topEmployees,
   };
 };
+
 export const getAllEmployees = async (page = 1, limit = 10, search = "") => {
   page = Number(page);
   limit = Number(limit);

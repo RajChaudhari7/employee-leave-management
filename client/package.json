@@ -23,7 +23,6 @@
     "framer-motion": "^12.43.0",
     "lucide-react": "^1.27.0",
     "react": "^19.2.7",
-    "react-countup": "^6.5.3",
     "react-dom": "^19.2.7",
     "react-dropzone": "^19.2.0",
     "react-hook-form": "^7.84.0",

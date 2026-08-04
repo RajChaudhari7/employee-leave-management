@@ -1,5 +1,10 @@
 import api from "../api/axios";
 
+export const getDashboard = async () => {
+  const response = await api.get("/manager/dashboard");
+  return response.data;
+};
+
 // Get all leave requests
 export const getLeaveRequests = async (
   page = 1,
