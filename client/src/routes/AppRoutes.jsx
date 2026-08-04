@@ -10,11 +10,13 @@ import LeaveHistory from "../pages/employee/LeaveHistory";
 import Notifications from "../pages/employee/Notifications";
 import LeaveRequests from "../pages/manager/LeaveRequests";
 import Employees from "../pages/manager/Employees";
+import Register from "../pages/auth/Register";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route
         path="/employee"
