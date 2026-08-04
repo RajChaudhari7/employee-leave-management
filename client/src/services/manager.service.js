@@ -33,3 +33,16 @@ export const updateLeaveStatus = async (leaveId, status, managerRemarks) => {
 
   return response.data;
 };
+
+// get all employee
+export const getEmployees = async (page = 1, limit = 8, search = "") => {
+  const response = await api.get("/manager/employees", {
+    params: {
+      page,
+      limit,
+      search,
+    },
+  });
+
+  return response.data;
+};

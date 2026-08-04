@@ -9,6 +9,7 @@ import ApplyLeave from "../pages/employee/ApplyLeave";
 import LeaveHistory from "../pages/employee/LeaveHistory";
 import Notifications from "../pages/employee/Notifications";
 import LeaveRequests from "../pages/manager/LeaveRequests";
+import Employees from "../pages/manager/Employees";
 
 export default function AppRoutes() {
   return (
@@ -38,6 +39,7 @@ export default function AppRoutes() {
         }
       >
         <Route path="dashboard" element={<ManagerDashboard />} />
+        <Route path="employees" element={<Employees />} />
         <Route path="leaves" element={<LeaveRequests   />} />
       </Route>
     </Routes>

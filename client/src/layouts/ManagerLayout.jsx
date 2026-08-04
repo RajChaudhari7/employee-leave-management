@@ -4,16 +4,14 @@ import Navbar from "../components/Navbar";
 
 export default function ManagerLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="bg-gray-100 min-h-screen">
       <Sidebar />
 
-      <div className="flex-1">
-        <Navbar />
+      <Navbar />
 
-        <main className="ml-72 flex-1 overflow-y-auto p-6">
-          <Outlet />
-        </main>
-      </div>
+      <main className="ml-72 p-8">
+        <Outlet />
+      </main>
     </div>
   );
 }
