@@ -6,7 +6,7 @@ import {
 
 import { applyLeaveSchema } from "../validators/employee.validator.js";
 
-import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
+import { uploadToCloudinary } from "../services/cloudinary.service.js";
 
 export const applyLeaveController = async (req, res) => {
   try {
@@ -15,10 +15,23 @@ export const applyLeaveController = async (req, res) => {
 
     const validatedData = applyLeaveSchema.parse(req.body);
 
+    let documentPath = null;
+
+    if (req.file) {
+      const uploadedFile = await uploadToCloudinary(
+        req.file.buffer,
+        req.file.originalname,
+      );
+
+      documentPath = uploadedFile.secure_url;
+
+      console.log("CLOUDINARY URL:", documentPath);
+    }
+
     const leave = await applyLeave({
       userId: req.user.id,
       ...validatedData,
-      documentPath: req.file?.path || null,
+      documentPath,
     });
 
     return res.status(201).json({
@@ -35,6 +48,7 @@ export const applyLeaveController = async (req, res) => {
     });
   }
 };
+
 export const getLeaveHistoryController = async (req, res) => {
   try {
     const leaves = await getLeaveHistory(req.user.id);
