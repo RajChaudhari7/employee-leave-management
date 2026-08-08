@@ -1,29 +1,39 @@
 import imagekit from "../config/imagekit.js";
 
-export const uploadToImageKit = async (fileBuffer, originalName) => {
+export const uploadToImageKit = async (
+  fileBuffer,
+  originalName,
+  mimetype,
+) => {
   try {
-    const cleanName = originalName
+    const safeName = originalName
       .replace(/\.[^/.]+$/, "")
       .replace(/[^a-zA-Z0-9-_]/g, "-");
 
-    const fileName = `${Date.now()}-${cleanName}`;
+    const extension = originalName.split(".").pop();
+
+    const fileName = `${Date.now()}-${safeName}.${extension}`;
 
     const result = await imagekit.files.upload({
       file: fileBuffer,
       fileName,
-      folder: "/employee-leave-management/leave-documents",
+      folder: "/leavems/leave-documents",
       useUniqueFileName: true,
+      isPrivateFile: false,
+      tags: ["leave-document"],
     });
 
-    console.log("========== IMAGEKIT SUCCESS ==========");
-    console.log("URL:", result.url);
-    console.log("FILE ID:", result.fileId);
-    console.log("======================================");
+    console.log("========== IMAGEKIT UPLOAD SUCCESS ==========");
+    console.log("File ID:", result.fileId);
+    console.log("File URL:", result.url);
+    console.log("File Path:", result.filePath);
+    console.log("==============================================");
 
     return result;
   } catch (error) {
     console.error("========== IMAGEKIT ERROR ==========");
-    console.error(error);
+    console.error("Message:", error.message);
+    console.error("Full Error:", error);
     console.error("====================================");
 
     throw error;

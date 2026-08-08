@@ -10,17 +10,24 @@ import { uploadToImageKit } from "../services/imagekit.service.js";
 
 export const applyLeaveController = async (req, res) => {
   try {
+    console.log("========== APPLY LEAVE ==========");
     console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
+    console.log("FILE:", req.file ? {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+    } : null);
 
     const validatedData = applyLeaveSchema.parse(req.body);
 
     let documentPath = null;
 
+    // Upload document to ImageKit
     if (req.file) {
       const uploadedFile = await uploadToImageKit(
         req.file.buffer,
         req.file.originalname,
+        req.file.mimetype,
       );
 
       documentPath = uploadedFile.url;
@@ -28,11 +35,14 @@ export const applyLeaveController = async (req, res) => {
       console.log("IMAGEKIT URL:", documentPath);
     }
 
+    // Save leave + ImageKit URL in database
     const leave = await applyLeave({
       userId: req.user.id,
       ...validatedData,
       documentPath,
     });
+
+    console.log("LEAVE CREATED:", leave.id);
 
     return res.status(201).json({
       success: true,
@@ -40,7 +50,9 @@ export const applyLeaveController = async (req, res) => {
       data: leave,
     });
   } catch (error) {
-    console.error("APPLY LEAVE ERROR:", error);
+    console.error("========== APPLY LEAVE ERROR ==========");
+    console.error(error);
+    console.error("======================================");
 
     return res.status(400).json({
       success: false,
