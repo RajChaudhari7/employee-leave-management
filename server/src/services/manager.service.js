@@ -194,9 +194,11 @@ export const getAllLeaveRequests = async (
       where,
       skip,
       take: limit,
+
       orderBy: {
         createdAt: "desc",
       },
+
       include: {
         employee: {
           select: {
@@ -212,27 +214,14 @@ export const getAllLeaveRequests = async (
     }),
   ]);
 
-  const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
-
-  const formattedLeaves = leaves.map((leave) => {
-    let documentUrl = null;
-
-    if (leave.documentPath) {
-      const normalizedPath = leave.documentPath
-        .replace(/^src[\\/]/, "")
-        .replace(/\\/g, "/");
-
-      documentUrl = `${BASE_URL}/${normalizedPath}`;
-    }
-
-    return {
-      ...leave,
-      documentUrl,
-    };
-  });
+  const formattedLeaves = leaves.map((leave) => ({
+    ...leave,
+    documentUrl: leave.documentPath || null,
+  }));
 
   return {
     leaves: formattedLeaves,
+
     pagination: {
       page,
       limit,

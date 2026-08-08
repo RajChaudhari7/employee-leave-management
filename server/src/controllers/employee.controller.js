@@ -1,14 +1,34 @@
-import { applyLeave, getDashboardData, getLeaveHistory } from "../services/employee.service.js";
+import {
+  applyLeave,
+  getDashboardData,
+  getLeaveHistory,
+} from "../services/employee.service.js";
+
 import { applyLeaveSchema } from "../validators/employee.validator.js";
+
+import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
 
 export const applyLeaveController = async (req, res) => {
   try {
     const validatedData = applyLeaveSchema.parse(req.body);
 
+    let documentUrl = null;
+
+    // Upload document to Cloudinary
+    if (req.file) {
+      const result = await uploadToCloudinary(
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype,
+      );
+
+      documentUrl = result.secure_url;
+    }
+
     const leave = await applyLeave({
       userId: req.user.id,
       ...validatedData,
-      documentPath: req.file?.path || null,
+      documentPath: documentUrl,
     });
 
     return res.status(201).json({
@@ -17,6 +37,8 @@ export const applyLeaveController = async (req, res) => {
       data: leave,
     });
   } catch (error) {
+    console.error("Apply leave error:", error);
+
     return res.status(400).json({
       success: false,
       message: error.message,
