@@ -10,25 +10,15 @@ import { uploadToCloudinary } from "../utils/cloudinaryUpload.js";
 
 export const applyLeaveController = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
     const validatedData = applyLeaveSchema.parse(req.body);
-
-    let documentUrl = null;
-
-    // Upload document to Cloudinary
-    if (req.file) {
-      const result = await uploadToCloudinary(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.mimetype,
-      );
-
-      documentUrl = result.secure_url;
-    }
 
     const leave = await applyLeave({
       userId: req.user.id,
       ...validatedData,
-      documentPath: documentUrl,
+      documentPath: req.file?.path || null,
     });
 
     return res.status(201).json({
@@ -37,7 +27,7 @@ export const applyLeaveController = async (req, res) => {
       data: leave,
     });
   } catch (error) {
-    console.error("Apply leave error:", error);
+    console.error("APPLY LEAVE ERROR:", error);
 
     return res.status(400).json({
       success: false,
@@ -45,7 +35,6 @@ export const applyLeaveController = async (req, res) => {
     });
   }
 };
-
 export const getLeaveHistoryController = async (req, res) => {
   try {
     const leaves = await getLeaveHistory(req.user.id);
