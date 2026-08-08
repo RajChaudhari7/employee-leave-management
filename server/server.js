@@ -12,39 +12,16 @@ import connectCloudinary from "./src/config/cloudinary.js";
 dotenv.config();
 
 const app = express();
+await connectCloudinary();
+const allowedOrigins = ['http://localhost:5173', 'https://employee-leave-management-drab.vercel.app']
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL,
-].filter(Boolean);
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error(`CORS blocked: ${origin}`));
-  },
-
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-
-  allowedHeaders: ["Content-Type", "Authorization"],
-
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
-await connectCloudinary();
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
