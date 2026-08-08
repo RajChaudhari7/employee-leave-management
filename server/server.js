@@ -12,16 +12,17 @@ import connectCloudinary from "./src/config/cloudinary.js";
 dotenv.config();
 
 const app = express();
-await connectCloudinary();
-const allowedOrigins = ['http://localhost:5173', 'https://employee-leave-management-drab.vercel.app']
 
-
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
-
+await connectCloudinary();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
