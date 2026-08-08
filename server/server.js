@@ -19,8 +19,6 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
-console.log("Allowed Origins:", allowedOrigins);
-
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) {
@@ -31,19 +29,12 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    console.log("CORS BLOCKED:", origin);
+    console.log("CORS blocked:", origin);
 
     return callback(new Error(`CORS blocked: ${origin}`));
   },
 
-  methods: [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
   allowedHeaders: [
     "Content-Type",
@@ -59,19 +50,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
+
 app.use(helmet());
+
 app.use(morgan("dev"));
 
+
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/employee", employeeRoutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/notifications", notificationRoutes);
 
+
+// Health check
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Employee Leave Management API Running 🚀",
+    message: "Employee Leave Management API Running",
   });
 });
 
-export default app;
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
