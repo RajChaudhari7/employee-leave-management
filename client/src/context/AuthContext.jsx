@@ -5,6 +5,9 @@ export const AuthContext = createContext();
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
+  // Important: wait until localStorage has been checked
+  const [loading, setLoading] = useState(true);
+
   const login = (userData, token) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
@@ -13,27 +16,49 @@ export default function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     setUser(null);
   };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser && storedUser !== "undefined") {
+    const restoreAuth = () => {
       try {
-        setUser(JSON.parse(storedUser));
+        const storedUser = localStorage.getItem("user");
+        const storedToken = localStorage.getItem("token");
+
+        if (
+          storedUser &&
+          storedUser !== "undefined" &&
+          storedToken &&
+          storedToken !== "undefined"
+        ) {
+          const parsedUser = JSON.parse(storedUser);
+
+          setUser(parsedUser);
+        }
       } catch (error) {
-        console.error("Invalid user in localStorage:", error);
+        console.error("Invalid authentication data:", error);
+
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
+
+        setUser(null);
+      } finally {
+        // Authentication check is complete
+        setLoading(false);
       }
-    }
+    };
+
+    restoreAuth();
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        loading,
         login,
         logout,
       }}
