@@ -8,6 +8,7 @@ import authRoutes from "./src/routes/auth.routes.js";
 import employeeRoutes from "./src/routes/employee.routes.js";
 import managerRoutes from "./src/routes/manager.routes.js";
 import notificationRoutes from "./src/routes/notification.routes.js";
+import connectCloudinary from "./src/config/cloudinary.js";
 dotenv.config();
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
+await connectCloudinary();
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
