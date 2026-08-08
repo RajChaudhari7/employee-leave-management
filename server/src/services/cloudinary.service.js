@@ -9,16 +9,28 @@ export const uploadToCloudinary = (fileBuffer, originalName) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: "employee-leave-management/leave-documents",
-        resource_type: "auto",
+        resource_type: "image",
         public_id: publicId,
       },
       (error, result) => {
         if (error) {
-          console.error("CLOUDINARY UPLOAD ERROR:", error);
+          console.error("========== CLOUDINARY ERROR ==========");
+          console.error("Message:", error.message);
+          console.error("HTTP Code:", error.http_code);
+          console.error("Name:", error.name);
+          console.error("Full Error:", error);
+          console.error("======================================");
+
           reject(error);
-        } else {
-          resolve(result);
+          return;
         }
+
+        console.log("========== CLOUDINARY SUCCESS ==========");
+        console.log("URL:", result.secure_url);
+        console.log("Public ID:", result.public_id);
+        console.log("========================================");
+
+        resolve(result);
       }
     );
 
