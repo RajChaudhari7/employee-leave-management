@@ -1,8 +1,8 @@
-import cloudinary from "../config/cloudinary.js";
+import connectCloudinary from "../config/cloudinary.js";
 
 export const uploadToCloudinary = (fileBuffer, originalName, mimetype) => {
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
+    const uploadStream = connectCloudinary.uploader.upload_stream(
       {
         folder: "leavems/leave-documents",
         resource_type: "auto",

@@ -1,4 +1,5 @@
-import cloudinary from "../config/cloudinary.js";
+import connectCloudinary from "../config/cloudinary";
+
 
 export const uploadToCloudinary = (fileBuffer, originalName) => {
   return new Promise((resolve, reject) => {
@@ -6,7 +7,7 @@ export const uploadToCloudinary = (fileBuffer, originalName) => {
       .replace(/\.[^/.]+$/, "")
       .replace(/[^a-zA-Z0-9-_]/g, "-");
 
-    const uploadStream = cloudinary.uploader.upload_stream(
+    const uploadStream = connectCloudinary.uploader.upload_stream(
       {
         folder: "employee-leave-management/leave-documents",
         resource_type: "auto",
