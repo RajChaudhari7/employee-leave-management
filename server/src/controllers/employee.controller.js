@@ -6,7 +6,7 @@ import {
 
 import { applyLeaveSchema } from "../validators/employee.validator.js";
 
-import { uploadToCloudinary } from "../services/cloudinary.service.js";
+import { uploadToImageKit } from "../services/imagekit.service.js";
 
 export const applyLeaveController = async (req, res) => {
   try {
@@ -18,14 +18,14 @@ export const applyLeaveController = async (req, res) => {
     let documentPath = null;
 
     if (req.file) {
-      const uploadedFile = await uploadToCloudinary(
+      const uploadedFile = await uploadToImageKit(
         req.file.buffer,
         req.file.originalname,
       );
 
-      documentPath = uploadedFile.secure_url;
+      documentPath = uploadedFile.url;
 
-      console.log("CLOUDINARY URL:", documentPath);
+      console.log("IMAGEKIT URL:", documentPath);
     }
 
     const leave = await applyLeave({
