@@ -4,10 +4,11 @@ export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  // Important: wait until localStorage has been checked
-  const [loading, setLoading] = useState(true);
-
+  // =========================
+  // LOGIN
+  // =========================
   const login = (userData, token) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
@@ -15,6 +16,9 @@ export default function AuthProvider({ children }) {
     setUser(userData);
   };
 
+  // =========================
+  // LOGOUT
+  // =========================
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -22,45 +26,45 @@ export default function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // =========================
+  // RESTORE AUTH ON REFRESH
+  // =========================
   useEffect(() => {
-    const restoreAuth = () => {
-      try {
-        const storedUser = localStorage.getItem("user");
-        const storedToken = localStorage.getItem("token");
+    try {
+      const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
 
-        if (
-          storedUser &&
-          storedUser !== "undefined" &&
-          storedToken &&
-          storedToken !== "undefined"
-        ) {
-          const parsedUser = JSON.parse(storedUser);
+      if (
+        storedUser &&
+        storedUser !== "undefined" &&
+        storedToken &&
+        storedToken !== "undefined"
+      ) {
+        const parsedUser = JSON.parse(storedUser);
 
-          setUser(parsedUser);
-        }
-      } catch (error) {
-        console.error("Invalid authentication data:", error);
-
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-
-        setUser(null);
-      } finally {
-        // Authentication check is complete
-        setLoading(false);
+        setUser(parsedUser);
       }
-    };
+    } catch (error) {
+      console.error("Failed to restore authentication:", error);
 
-    restoreAuth();
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
+      setUser(null);
+    } finally {
+      // VERY IMPORTANT
+      // Authentication restoration is finished
+      setAuthLoading(false);
+    }
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        loading,
         login,
         logout,
+        authLoading,
       }}
     >
       {children}
